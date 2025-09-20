@@ -5,7 +5,7 @@ export const dolike = async (req, res, next) => {
     try {
         const { blog, author } = req.body;
         let like;
-        like = await BlogLike.findOne({blog: blog, author: author});
+        like = await BlogLike.findOne({blog: blog, author: author}).lean();
         if(!like){
             like = await BlogLike.create({ blog, author });
             

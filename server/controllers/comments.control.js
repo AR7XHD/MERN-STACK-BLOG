@@ -21,7 +21,7 @@ export const getAllComments = async (req, res, next) => {
     try {
         const {id} = req.params;
         
-        const comments = await Comment.find({blog: id}).sort({createdAt: -1}).populate("author","username profilePicture").populate("blog","title");
+        const comments = await Comment.find({blog: id}).sort({createdAt: -1}).populate("author","username profilePicture").populate("blog","title").lean();
         res.status(200).json({
             success: true,
             message: "Comments fetched successfully",
@@ -53,10 +53,10 @@ export const getComments = async (req, res, next) => {
         // console.log(Currentuser)
         let comments;
         if(Currentuser.role== "admin"){
-        comments = await Comment.find().sort({createdAt: -1}).populate("author","username profilePicture").populate("blog","title");
+        comments = await Comment.find().sort({createdAt: -1}).populate("author","username profilePicture").populate("blog","title").lean();
     }
     else {
-        comments = await Comment.find({author: Currentuser._id}).sort({createdAt: -1}).populate("author","username profilePicture").populate("blog","title");
+        comments = await Comment.find({author: Currentuser._id}).sort({createdAt: -1}).populate("author","username profilePicture").populate("blog","title").lean();
     }
         res.status(200).json({
             success: true,

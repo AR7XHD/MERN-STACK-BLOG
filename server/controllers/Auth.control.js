@@ -67,7 +67,7 @@ export const register = async (req, res, next) => {
 
     try {
         const {username, email, password} = req.body;
-        const checkUser = await User.findOne({email});
+        const checkUser = await User.findOne({email}).lean();
         if(checkUser && checkUser.authProvider === "google"){
             return next(handlerError(400, `User already exists with ${checkUser.authProvider}`))
         }

@@ -1,7 +1,6 @@
 import express from "express";
 import cookieParser from "cookie-parser";
 import cors from "cors";
-import mongoose from "mongoose";
 import "dotenv/config";
 import { handlerError } from "./helpers/handlerError.js";
 import AuthRouter from "./Routes/Auth.routes.js";
@@ -11,10 +10,14 @@ import BlogRouter from "./Routes/blog.routes.js";
 import CommentRouter from "./Routes/comments.routes.js";
 import BlogLikeRouter from "./Routes/bloglike.routes.js";
 import https from "https";
+import dbConnect from "./config/db.js";
+
 https.globalAgent.keepAlive = true;
 
-
 const app = express();
+
+// Connect to DB
+dbConnect();
 
 app.use(express.json());
 // app.use(express.urlencoded({ extended: true }));
@@ -30,10 +33,6 @@ app.use("/api/category", CategoryRouter);
 app.use("/api/blog", BlogRouter);
 app.use("/api/comment", CommentRouter);
 app.use("/api/bloglike", BlogLikeRouter);
-
-mongoose.connect(process.env.MONGO_URL)
-    .then(() => console.log("Connected to MongoDB"))
-    .catch((error) => console.log(error));
 
 
 
