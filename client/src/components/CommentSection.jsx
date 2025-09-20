@@ -83,13 +83,13 @@ const CommentSection = ({props}) => {
               <FormLabel className="text-sm font-medium mb-2">Comment</FormLabel>
               
               <FormControl>
-                <Textarea placeholder="comment" {...field} className="h-20" />
+                <Textarea placeholder="comment" {...field} className="h-20 cursor-pointer" />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
-        <Button type="submit">Submit</Button>
+        <Button type="submit" className="cursor-pointer">Submit</Button>
       </form>
     </Form>
         </CardContent>
@@ -98,7 +98,7 @@ const CommentSection = ({props}) => {
     <div className="w-full">
       {/* Header */}
       <div className="mb-4 mt-4 flex items-center justify-between">
-        <h3 className="text-lg font-semibold text-gray-800">
+        <h3 className="text-lg font-semibold text-gray-800 cursor-pointer">
           {CommentData?.comments?.length} Comments
         </h3>
       </div>
@@ -108,17 +108,16 @@ const CommentSection = ({props}) => {
         {commentsToDisplay?.map((comment) => (
           <div
             key={comment._id}
-            className="flex gap-4 items-start bg-white p-4 rounded-xl shadow-sm border"
+            className="flex gap-4 items-start bg-white p-4 rounded-xl shadow-sm border cursor-pointer"
           >
             {/* Avatar */}
             <div className="flex-shrink-0">
-              <div className="w-12 h-12 rounded-full overflow-hidden bg-gray-100 flex items-center justify-center">
+              <div className="w-12 h-12 rounded-full overflow-hidden bg-gray-100 flex items-center justify-center cursor-pointer">
                 {comment.author?.profilePicture ? (
                   <img
                     src={comment.author.profilePicture}
                     alt={comment.author.username || "author"}
-                    className="w-full h-full object-cover"
-                    // onError={(e) => {
+                    className="w-full h-full object-cover cursor-pointer"
                     //   e.currentTarget.onerror = null;
                     //   e.currentTarget.src = AVATAR_PLACEHOLDER;
                     // }}
@@ -143,7 +142,7 @@ const CommentSection = ({props}) => {
               <div className="flex items-center justify-between">
                 <div>
                   <div className="flex items-center gap-2">
-                    <span className="text-sm font-medium text-gray-800">
+                    <span className="text-sm font-medium text-gray-800 cursor-pointer">
                       {comment.author?.username ?? "Unknown"}
                     </span>
                     <span className="text-xs text-gray-400">·</span>
@@ -187,7 +186,7 @@ const CommentSection = ({props}) => {
             <Button
               variant="link"
               onClick={() => setShowAllComments(true)}
-              className="text-sm font-medium text-indigo-600 hover:text-indigo-800"
+              className="text-sm font-medium text-indigo-600 hover:text-indigo-800 cursor-pointer"
             >
               Show all {CommentData.comments.length} comments
             </Button>
@@ -198,7 +197,7 @@ const CommentSection = ({props}) => {
             <Button
               variant="link"
               onClick={() => setShowAllComments(false)}
-              className="text-sm font-medium text-indigo-600 hover:text-indigo-800"
+              className="text-sm font-medium text-indigo-600 hover:text-indigo-800 cursor-pointer"
             >
               Show less
             </Button>

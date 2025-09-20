@@ -62,8 +62,8 @@ const BlogLike = ({props}) => {
     
   return (
     <div className='flex items-center gap-1'>
-        {userLiked && <FaHeart onClick={handleLike} className='w-4 h-4' color='red'/> }
-        {!userLiked && <CiHeart onClick={handleLike} className='w-4 h-4' />}
+        {userLiked && <FaHeart onClick={handleLike} className='w-4 h-4 cursor-pointer' color='red'/> }
+        {!userLiked && <CiHeart onClick={handleLike} className='w-4 h-4 cursor-pointer' />}
         <span>{likesCount}</span>
     </div>
   )

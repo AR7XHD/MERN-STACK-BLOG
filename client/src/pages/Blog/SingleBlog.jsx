@@ -1,5 +1,5 @@
 // SingleBlog.jsx
-import React from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { useFetch } from "@/hooks/usefetch";
 import { getEnv } from "@/helpers/getEnv";
@@ -64,6 +64,34 @@ const SingleBlog = () => {
     ? DOMPurify.sanitize(blogdata.content, { USE_PROFILES: { html: true } })
     : null;
 
+  // State for read more functionality
+  const [showFullContent, setShowFullContent] = useState(false);
+  const [isClamped, setIsClamped] = useState(false);
+  const contentRef = useRef(null);
+  const [maxHeight, setMaxHeight] = useState('24rem');
+
+  // Check if content needs to be clamped
+  useEffect(() => {
+    if (contentRef.current) {
+      const element = contentRef.current;
+      // Create a clone to measure full height without restrictions
+      const clone = element.cloneNode(true);
+      clone.style.position = 'absolute';
+      clone.style.visibility = 'hidden';
+      clone.style.height = 'auto';
+      clone.style.maxHeight = 'none';
+      document.body.appendChild(clone);
+      
+      const fullHeight = clone.scrollHeight;
+      const maxHeightPx = 24 * 16; // 24rem in pixels
+      
+      setIsClamped(fullHeight > maxHeightPx);
+      setMaxHeight(isClamped && !showFullContent ? '24rem' : 'none');
+      
+      document.body.removeChild(clone);
+    }
+  }, [sanitizedContent, showFullContent, isClamped]);
+
   return (
     <div className="min-h-screen bg-white text-gray-800">
       <main className="max-w-5xl mx-auto px-4 py-12 relative">
@@ -77,8 +105,8 @@ const SingleBlog = () => {
 
         {/* Top-right small like + comment counts */}
         {blogdata && (
-          <div className="absolute right-6 top-6 z-20">
-            <div className="flex items-center gap-4 bg-white/80 backdrop-blur-sm border border-gray-100 px-3 py-1.5 rounded-full shadow-sm">
+          <div className="absolute right-6 top-0 z-20 ">
+            <div className="flex items-center gap-4 bg-white/80 backdrop-blur-sm border border-gray-100 px-3 py-1.5 rounded-full shadow-sm md:mb-0">
               {/* Like */}
               <div className="flex items-center gap-1 text-sm text-gray-700">
                 <BlogLike props={id} />
@@ -114,11 +142,11 @@ const SingleBlog = () => {
                 <img
                   src={blogdata.author.profilePicture}
                   alt={blogdata.author.username}
-                  className="w-10 h-10 rounded-full object-contain"
+                  className="w-10 h-10 rounded-full object-contain cursor-pointer"
                   onError={(e) => (e.currentTarget.style.display = "none")}
                 />
               ) : (
-                <div className="w-10 h-10 rounded-full flex items-center justify-center bg-gray-100 text-xs font-medium text-gray-600">
+                <div className="w-10 h-10 rounded-full flex items-center justify-center bg-gray-100 text-xs font-medium text-gray-600 cursor-pointer">
                   {blogdata.author?.username
                     ? blogdata.author.username
                         .split(" ")
@@ -159,10 +187,50 @@ const SingleBlog = () => {
             {/* Content */}
             <div className="prose prose-lg max-w-none mx-auto text-gray-700">
               {sanitizedContent ? (
-                <div
-                  className="blog-content"
-                  dangerouslySetInnerHTML={{ __html: sanitizedContent }}
-                />
+                <div className="relative">
+                  <div
+                    ref={contentRef}
+                    className="blog-content transition-all duration-300 overflow-hidden"
+                    style={{
+                      maxHeight: maxHeight,
+                      WebkitMaskImage: !showFullContent && isClamped 
+                        ? 'linear-gradient(to bottom, black 60%, transparent 100%)' 
+                        : 'none',
+                      maskImage: !showFullContent && isClamped 
+                        ? 'linear-gradient(to bottom, black 60%, transparent 100%)' 
+                        : 'none',
+                      transition: 'max-height 0.3s ease-out',
+                    }}
+                    dangerouslySetInnerHTML={{ __html: sanitizedContent }}
+                  />
+                  {!showFullContent && isClamped && (
+                    <div className="relative mt-4">
+                      <div className="absolute -top-16 left-0 right-0 h-16 bg-gradient-to-t from-white to-transparent pointer-events-none" />
+                      <button
+                        onClick={() => setShowFullContent(true)}
+                        className="relative z-10 mx-auto flex items-center gap-1 text-indigo-600 hover:text-indigo-800 font-medium text-sm bg-white px-4 py-2 rounded-full shadow-sm border border-gray-200 hover:shadow transition-all duration-200 cursor-pointer"
+                      >
+                        Read More
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                          <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+                        </svg>
+                      </button>
+                    </div>
+                  )}
+                  {showFullContent && isClamped && (
+                    <div className="mt-4 text-center">
+                      <button
+                        onClick={() => setShowFullContent(false)}
+                        className="text-indigo-600 hover:text-indigo-800 font-medium text-sm flex items-center gap-1 mx-auto cursor-pointer"
+                      >
+                        Show Less
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                          <path fillRule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clipRule="evenodd" />
+                        </svg>
+                      </button>
+                    </div>
+                  )}
+                </div>
               ) : (
                 <>
                   <p>
@@ -184,14 +252,14 @@ const SingleBlog = () => {
               )}
 
               {/* Optional call to action */}
-              <div className="mt-8">
+              {/* <div className="mt-8">
                 <a
                   href="#"
-                  className="inline-block bg-indigo-600 text-white px-5 py-2 rounded-md shadow hover:bg-indigo-700 transition"
+                  className="inline-block bg-indigo-600 text-white px-5 py-2 rounded-md shadow hover:bg-indigo-700 transition cursor-pointer"
                 >
                   Read more posts
                 </a>
-              </div>
+              </div> */}
             </div>
           </article>
         ) : (

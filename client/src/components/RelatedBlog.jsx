@@ -13,7 +13,7 @@ const RelatedBlog = ({props}) => {
       });
   return (
     <div>
-      <h2 className="text-2xl font-bold mb-4">Related Blogs</h2>
+      <h2 className="text-2xl font-bold mb-4 mt-5 cursor-pointer">Related Blogs</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {RelatedData && 
           RelatedData?.blog?.map((blog,index) => (
