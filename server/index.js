@@ -12,21 +12,22 @@ import BlogLikeRouter from "./Routes/bloglike.routes.js";
 import https from "https";
 import dbConnect from "./config/db.js";
 
-https.globalAgent.keepAlive = true;
-
+// Initialize express app
 const app = express();
 
-// Connect to DB
-dbConnect();
+// Global HTTP agent settings
+https.globalAgent.keepAlive = true;
 
+// Middleware
 app.use(express.json());
-// app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(cors({
     origin: process.env.FRONTEND_API, 
     credentials: true
 }));
 
+// Routes
 app.use("/api/auth", AuthRouter);
 app.use("/api/user", UserRouter);
 app.use("/api/category", CategoryRouter);
@@ -34,16 +35,29 @@ app.use("/api/blog", BlogRouter);
 app.use("/api/comment", CommentRouter);
 app.use("/api/bloglike", BlogLikeRouter);
 
-
-
-const port = process.env.PORT || 5173;
-
-app.listen(port, () => {
-    console.log(`Server is running on port ${port}`);
-});
-
-app.use((err,req,res,next)=>{
+// Error handling middleware
+app.use((err, req, res, next) => {
+    console.error('Error:', err);
     const status = err.status || 500;
     const message = err.message || "Something went wrong";
-    res.status(status).json({success: false, message});
-})
+    res.status(status).json({ success: false, message });
+});
+
+// Connect to DB and start server
+const startServer = async () => {
+    try {
+        console.log('Connecting to database...');
+        await dbConnect();
+        
+        const port = process.env.PORT || 5173;
+        app.listen(port, () => {
+            console.log(`Server is running on port ${port}`);
+        });
+    } catch (error) {
+        console.error('Failed to start server:', error);
+        process.exit(1);
+    }
+};
+
+// Start the server
+startServer();

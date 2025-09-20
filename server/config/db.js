@@ -8,33 +8,34 @@ if (!MONGODB_URI) {
     );
 }
 
+// Connection config
+const connection = {};
+
 /**
- * Global is used here to maintain a cached connection across hot reloads
- * in development. This prevents connections from growing exponentially
- * during API Route usage.
+ * Creates a new database connection if one doesn't exist,
+ * or returns the existing connection if it's already established.
  */
-let cached = global.mongoose;
-
-if (!cached) {
-    cached = global.mongoose = { conn: null, promise: null };
-}
-
 async function dbConnect() {
-    if (cached.conn) {
-        return cached.conn;
+    if (connection.isConnected) {
+        console.log('Using existing database connection');
+        return;
     }
 
-    if (!cached.promise) {
-        const opts = {
-            bufferCommands: false,
-        };
-
-        cached.promise = mongoose.connect(MONGODB_URI, opts).then((mongoose) => {
-            return mongoose;
+    try {
+        // Connect to MongoDB
+        const db = await mongoose.connect(MONGODB_URI, {
+            useNewUrlParser: true,
+            useUnifiedTopology: true,
+            serverSelectionTimeoutMS: 5000, // 5 seconds timeout
+            socketTimeoutMS: 45000, // 45 seconds
         });
+
+        connection.isConnected = db.connections[0].readyState === 1;
+        console.log('MongoDB connected successfully');
+    } catch (error) {
+        console.error('MongoDB connection error:', error);
+        process.exit(1);
     }
-    cached.conn = await cached.promise;
-    return cached.conn;
 }
 
 export default dbConnect;
