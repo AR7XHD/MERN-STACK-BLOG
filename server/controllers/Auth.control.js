@@ -34,31 +34,38 @@ export const googleLogin = async (req, res, next) => {
            return next(handlerError(400, "User already exists"))
         }
 
-        const token = jwt.sign({_id: user._id,
-            email: user.email,
-            authProvider: user.authProvider,
-            username: user.username,
-            avatar: user.avatar}, process.env.JWT_SECRET, {expiresIn: "1h"});
+        const token = jwt.sign(
+            {
+                _id: user._id,
+                email: user.email,
+                authProvider: user.authProvider,
+                username: user.username,
+                avatar: user.avatar
+            },
+            process.env.JWT_SECRET,
+            { expiresIn: "1h" }
+        );
 
+        // Set cookie with proper configuration
+        const cookieOptions = {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+            path: "/",
+            maxAge: 3600000, // 1 hour in milliseconds
+            domain: process.env.NODE_ENV === "production" ? ".yourdomain.com" : undefined // Replace with your domain
+        };
 
-            res.cookie("accessToken", token, {
-                httpOnly: true,
-                secure: true,
-                sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
-                path: "/",
-              });
-              
-
-    
-
-    const newUser = user.toObject({getters: true});
-    delete newUser.password;
-
-    res.status(201).json({
-        user: newUser,
-        success: true,
-        message: (isNew) ? "User registered successfully" : "User logged in successfully",
-    });
+        res.cookie("accessToken", token, cookieOptions);
+        
+        const newUser = user.toObject({getters: true});
+        delete newUser.password;
+        
+        res.status(200).json({
+            user: newUser,
+            success: true,
+            message: isNew ? "User registered successfully" : "User logged in successfully"
+        });
     } catch (error) {
         return next(handlerError(500, error.message));
     }
@@ -126,24 +133,38 @@ export const login = async (req, res, next) => {
         return next(handlerError(400, "Invalid credentials"))
     }
 
-    const token = jwt.sign({_id: user._id ,email: user.email,authProvider: user.authProvider,username: user.username,avatar: user.avatar}, process.env.JWT_SECRET, {expiresIn: "1h"});
+    const token = jwt.sign(
+        {
+            _id: user._id,
+            email: user.email,
+            authProvider: user.authProvider,
+            username: user.username,
+            avatar: user.avatar
+        },
+        process.env.JWT_SECRET,
+        { expiresIn: "1h" }
+    );
 
-    res.cookie("accessToken", token,{
+    // Set cookie with proper configuration
+    const cookieOptions = {
         httpOnly: true,
-        secure: true,
-        sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
+        secure: process.env.NODE_ENV === "production",
+        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
         path: "/",
-    });
+        maxAge: 3600000, // 1 hour in milliseconds
+       
+    };
 
+    res.cookie("accessToken", token, cookieOptions);
 
-
-    const newUser = user.toObject({getters: true});
+    const newUser = user.toObject({ getters: true });
     delete newUser.password;
 
     res.status(200).json({
         user: newUser,
         success: true,
-        message: "User logged in successfully"});
+        message: "User logged in successfully"
+    });
     
     
 } catch (error) {
