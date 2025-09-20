@@ -1,8 +1,9 @@
 {
     "rewrites": [
-        {
-            "source": "/(.*)",
-            "destination": "/"
-        }
+      {
+        "source": "/api/:path*",
+        "destination": "https://mern-stack-blog-five.vercel.app/api/:path*"
+      }
     ]
-}
+  }
+  
