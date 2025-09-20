@@ -15,6 +15,10 @@ import dbConnect from "./config/db.js";
 // Initialize express app
 const app = express();
 
+// after const app = express();
+app.set('trust proxy', 1); // Vercel terminates TLS at its proxy — makes secure detection work
+
+
 // Global HTTP agent settings
 https.globalAgent.keepAlive = true;
 
