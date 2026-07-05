@@ -88,7 +88,7 @@ const SignIn = () => {
             </div>
           </div>
           <CardTitle className="text-2xl">Sign In</CardTitle>
-          <CardDescription>Enter your credentials to access your account.</CardDescription>
+          <CardDescription>Enter your credentials to access your account...</CardDescription>
         </CardHeader>
 
         <CardContent>
