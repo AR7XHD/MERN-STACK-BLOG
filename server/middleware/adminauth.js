@@ -55,6 +55,7 @@ export const adminauth = async (req, res, next) => {
     } catch (error) {
         console.error('Admin auth middleware error:', error);
         return next(handlerError(500, 'Admin authentication failed'));
+        
     }
     
 
